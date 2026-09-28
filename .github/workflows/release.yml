@@ -41,7 +41,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: electro56435/vizor
-          ref: ${{ inputs.vizor_ref || 'main' }}
+          # VIZOR_REF (repository variable) is the branch scheduled runs build; main once the one-app work is merged.
+          ref: ${{ inputs.vizor_ref || vars.VIZOR_REF || 'main' }}
           token: ${{ secrets.VIZOR_SOURCE_TOKEN }}
           submodules: recursive
           path: vizor
