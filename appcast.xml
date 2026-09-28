@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Vizor</title>
+    <item>
+      <title>0.12.7.1</title>
+      <pubDate>Mon, 28 Sep 2026 17:56:37 +0000</pubDate>
+      <sparkle:version>0.12.7.1</sparkle:version>
+      <sparkle:shortVersionString>0.12.7.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description>OpenSuperWhisper v0.12.7 with Vizor release 1.</description>
+      <enclosure url="https://github.com/electro56435/vizor-release/releases/download/v0.12.7.1/Vizor-0.12.7.1.zip" type="application/octet-stream" sparkle:edSignature="kNbJPOyxIEi94j3fua/uOHBQ8s5YZ/0J/IT+36pwdaVpyiWSTwLWLnobpORsPsEDpks7NbBpRkGg/Lc/QuHNAQ==" length="53931811" />
+    </item>
+  </channel>
+</rss>
