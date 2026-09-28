@@ -3,13 +3,13 @@
   <channel>
     <title>Vizor</title>
     <item>
-      <title>0.12.7.1</title>
-      <pubDate>Mon, 28 Sep 2026 17:56:37 +0000</pubDate>
-      <sparkle:version>0.12.7.1</sparkle:version>
-      <sparkle:shortVersionString>0.12.7.1</sparkle:shortVersionString>
+      <title>0.12.7.2</title>
+      <pubDate>Mon, 28 Sep 2026 19:24:20 +0000</pubDate>
+      <sparkle:version>0.12.7.2</sparkle:version>
+      <sparkle:shortVersionString>0.12.7.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-      <description>OpenSuperWhisper v0.12.7 with Vizor release 1.</description>
-      <enclosure url="https://github.com/electro56435/vizor-release/releases/download/v0.12.7.1/Vizor-0.12.7.1.zip" type="application/octet-stream" sparkle:edSignature="kNbJPOyxIEi94j3fua/uOHBQ8s5YZ/0J/IT+36pwdaVpyiWSTwLWLnobpORsPsEDpks7NbBpRkGg/Lc/QuHNAQ==" length="53931811" />
+      <description>OpenSuperWhisper v0.12.7 with Vizor release 2.</description>
+      <enclosure url="https://github.com/electro56435/vizor-release/releases/download/v0.12.7.2/Vizor-0.12.7.2.zip" type="application/octet-stream" sparkle:edSignature="UXCvSavGdNd8NUabsTIwAHzUc6+ZwP3OEWVOIhfRc7aH8Nh/UK/ncszdTJ7mcC49nETLNrQo0UqbMCJSB27TBw==" length="52365328" />
     </item>
   </channel>
 </rss>
