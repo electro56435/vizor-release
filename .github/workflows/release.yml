@@ -1,0 +1,139 @@
+# Builds Vizor whenever upstream OpenSuperWhisper tags a release or
+# vizor's main moves, and publishes it here. The app's Settings, Updates installs it.
+#
+# This file belongs in the public electro56435/vizor-release repo. The build logic
+# lives in the private vizor repo (release/build-release.sh), checked out with
+# VIZOR_SOURCE_TOKEN.
+name: release
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+    inputs:
+      vizor_ref:
+        description: vizor branch or commit to build
+        default: main
+      force:
+        description: release even if nothing changed
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: releases
+
+      - uses: actions/checkout@v4
+        with:
+          repository: electro56435/vizor
+          ref: ${{ inputs.vizor_ref || 'main' }}
+          token: ${{ secrets.VIZOR_SOURCE_TOKEN }}
+          submodules: recursive
+          path: vizor
+
+      - name: Decide
+        id: decide
+        env:
+          FORCE: ${{ inputs.force }}
+        run: |
+          upstream="$(gh api repos/my-monkeys/OpenSuperWhisper/releases/latest -q .tag_name)"
+          # The tag comes from another repo and reaches shell commands: accept vX.Y.Z only.
+          if ! [[ "$upstream" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "unexpected upstream tag: refusing to build"
+            exit 1
+          fi
+          commit="$(git -C vizor rev-parse HEAD)"
+          state=releases/state.json
+          last_upstream="$(jq -r '.upstream // ""' "$state" 2>/dev/null || true)"
+          last_commit="$(jq -r '.vizor // ""' "$state" 2>/dev/null || true)"
+          last_release="$(jq -r '.release // 0' "$state" 2>/dev/null || echo 0)"
+          if [ "$upstream" = "$last_upstream" ] && [ "$commit" = "$last_commit" ] && [ "$FORCE" != "true" ]; then
+            echo "nothing new: $upstream, vizor $commit"
+            echo "build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$upstream" = "$last_upstream" ]; then release=$((last_release + 1)); else release=1; fi
+          echo "build=true" >> "$GITHUB_OUTPUT"
+          echo "upstream=$upstream" >> "$GITHUB_OUTPUT"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+
+      - name: Toolchain
+        if: steps.decide.outputs.build == 'true'
+        run: |
+          brew list libomp &>/dev/null || brew install libomp
+          brew list uv &>/dev/null || brew install uv
+          rustup target add aarch64-apple-darwin
+
+      - name: Build and sign
+        id: build
+        if: steps.decide.outputs.build == 'true'
+        working-directory: vizor
+        env:
+          UPSTREAM_TAG: ${{ steps.decide.outputs.upstream }}
+          VIZOR_RELEASE: ${{ steps.decide.outputs.release }}
+          SIGNING_P12_BASE64: ${{ secrets.SIGNING_P12_BASE64 }}
+          SIGNING_P12_PASSWORD: ${{ secrets.SIGNING_P12_PASSWORD }}
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+          OUT_DIR: ${{ github.workspace }}/out
+          REPO: ${{ github.repository }}
+        run: |
+          upstream_version="${UPSTREAM_TAG#v}"
+          export DOWNLOAD_URL_PREFIX="https://github.com/$REPO/releases/download/v${upstream_version}.${VIZOR_RELEASE}/"
+          set +e
+          release/build-release.sh
+          status=$?
+          set -e
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit $status
+
+      - name: Report a patch that no longer applies
+        if: failure() && steps.build.outputs.status == '3'
+        env:
+          UPSTREAM: ${{ steps.decide.outputs.upstream }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="upstream $UPSTREAM: dictation patch needs rebasing"
+          if ! gh issue list --repo "$REPO" --state open --search "$title in:title" --json number -q '.[0].number' | grep -q .; then
+            gh issue create --repo "$REPO" --title "$title" \
+              --body "dictation/upstream.patch does not apply to OpenSuperWhisper $UPSTREAM. Rebase it in the vizor repo, then run this workflow again. Run: $RUN_URL"
+          fi
+
+      - name: Publish
+        if: steps.decide.outputs.build == 'true'
+        env:
+          UPSTREAM: ${{ steps.decide.outputs.upstream }}
+          COMMIT: ${{ steps.decide.outputs.commit }}
+          RELEASE: ${{ steps.decide.outputs.release }}
+          REPO: ${{ github.repository }}
+        run: |
+          version="$(cat out/version)"
+          gh release create "v$version" out/*.zip --repo "$REPO" \
+            --title "Vizor $version" \
+            --notes "OpenSuperWhisper $UPSTREAM with Vizor (commit $COMMIT). Install from Settings, Updates in the app."
+          cp out/appcast.xml releases/appcast.xml
+          jq -n --arg u "$UPSTREAM" --arg c "$COMMIT" \
+            --argjson r "$RELEASE" --arg v "$version" \
+            '{upstream: $u, vizor: $c, release: $r, version: $v}' > releases/state.json
+          cd releases
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add appcast.xml state.json
+          git commit -m "release $version"
+          git push
