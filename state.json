@@ -1,6 +1,6 @@
 {
   "upstream": "v0.12.7",
-  "vizor": "5cc91b30434c43e5926656421d7a80d5c9062f7e",
-  "release": 2,
-  "version": "0.12.7.2"
+  "vizor": "588aea1614f5bde13519703668063323bfb3e327",
+  "release": 3,
+  "version": "0.12.7.3"
 }
