@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-15
+    runs-on: macos-26 # upstream needs the macOS 26 SDK (Liquid Glass)
     timeout-minutes: 90
     env:
       GH_TOKEN: ${{ github.token }}
