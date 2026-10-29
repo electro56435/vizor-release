@@ -3,13 +3,13 @@
   <channel>
     <title>Vizor</title>
     <item>
-      <title>0.12.7.5</title>
-      <pubDate>Thu, 29 Oct 2026 12:42:52 +0000</pubDate>
-      <sparkle:version>0.12.7.5</sparkle:version>
-      <sparkle:shortVersionString>0.12.7.5</sparkle:shortVersionString>
+      <title>0.12.7.6</title>
+      <pubDate>Thu, 29 Oct 2026 12:48:43 +0000</pubDate>
+      <sparkle:version>0.12.7.6</sparkle:version>
+      <sparkle:shortVersionString>0.12.7.6</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-      <description>OpenSuperWhisper v0.12.7 with Vizor release 5: Parakeet without vocabulary boosting (no more phantom dictionary words or lost takes), windowed decoding for mixed German and English, retryable empty reruns.</description>
-      <enclosure url="https://github.com/electro56435/vizor-release/releases/download/v0.12.7.5/Vizor-0.12.7.5.zip" type="application/octet-stream" sparkle:edSignature="yNjyOf5sBqGL+jE2fBKpr7UOjMwLdzoUqK+fzg6411CkFIU7crrtm31UCdQdXVVGSqPTFwaCmtTXDa62y+y4Bw==" length="42713195" />
+      <description>OpenSuperWhisper v0.12.7 with Vizor release 6: the 0.12.7.5 transcription fixes, and Sparkle's helpers signed like the app so in-place updates work again.</description>
+      <enclosure url="https://github.com/electro56435/vizor-release/releases/download/v0.12.7.6/Vizor-0.12.7.6.zip" type="application/octet-stream" sparkle:edSignature="4G1eOG9aP/rBDGJ7DuskvRhHE0wMGPT3IQaeFnp75L97sNoNsGR+Cav/IimdvaWAgirVopko8X2zFQX0S6UTAA==" length="42716588" />
     </item>
   </channel>
 </rss>
